@@ -93,7 +93,11 @@ static uint8_t s_app_arena[APP_ARENA_SIZE] __attribute__((aligned(16)));
 static uint8_t s_worker_scratch[WORKER_SCRATCH_SIZE] __attribute__((aligned(8)));
 static uint8_t s_worker_arena[WORKER_ARENA_SIZE] __attribute__((aligned(16)));
 
-static Process s_processes[] = {
+// The processes' starting state. The live ones are copied from it on first
+// use rather than initialised in place: the slots are mostly zero, but an
+// initialiser would put all of them in initialised data, which on some hosts
+// (ESP-IDF) must sit in scarce internal RAM, where zeroed data need not.
+static const Process s_process_defaults[] = {
   {
     .name = "App",
     .task = PebbleTask_App,
@@ -122,7 +126,15 @@ static Process s_processes[] = {
   },
 };
 
+static Process s_processes[ARRAY_LENGTH(s_process_defaults)];
+static bool s_processes_ready;
+
 static Process *prv_process_for_task(PebbleTask task) {
+  // Kernel threads run one at a time, so the first use cannot race.
+  if (!s_processes_ready) {
+    memcpy(s_processes, s_process_defaults, sizeof(s_processes));
+    s_processes_ready = true;
+  }
   return task == PebbleTask_Worker ? &s_processes[1] : &s_processes[0];
 }
 
