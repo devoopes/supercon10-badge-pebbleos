@@ -4,6 +4,7 @@
 #include "process_runtime.h"
 
 #include <pbl/kernel/compiler.h>
+#include <pbl/logging/logging.h>
 
 #include <process_management/pebble_process_md.h>
 
@@ -20,6 +21,14 @@ PBL_WEAK uint32_t process_runtime_sdk_table(PebbleTask task) {
 
 PBL_WEAK void process_runtime_run(const PebbleProcessMd *app_md, PebbleTask task, void *entry,
                                   void *stack_top) {
+#ifndef __arm__
+  // Installed apps are Thumb-2 code, which only an interpreter (Samsa) can
+  // run on another CPU: jumping into them would execute data.
+  if (app_md->process_storage != ProcessStorageBuiltin) {
+    PBL_LOG_ERR("can't run an installed app without an ARM interpreter");
+    return;
+  }
+#endif
   const PebbleMain main_func = entry;
   main_func();
 }
