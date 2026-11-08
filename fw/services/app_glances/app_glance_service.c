@@ -116,6 +116,12 @@ static void prv_blob_db_event_handler(PebbleEvent *event, void *context) {
     return;
   }
 
+  // A clear of the whole database names no app. On ARM watches reading
+  // through the NULL key happens to work, as address 0 is readable flash.
+  if (blob_db_event->key == nullptr) {
+    return;
+  }
+
   prv_glance_event_put((Uuid *)blob_db_event->key);
 }
 
