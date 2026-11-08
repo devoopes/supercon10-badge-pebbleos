@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 Core Devices LLC
+# SPDX-License-Identifier: Apache-2.0
+
+config RESOURCES_BOARD
+    default "qemu_flint"
+
+# The "pebble" partition of the ESP32-S3's flash (partitions_billboard.h).
+config FLASH_SIZE
+    default 0x4e0000
+
+config FW_FLASH_SIZE
+    default 0x300000

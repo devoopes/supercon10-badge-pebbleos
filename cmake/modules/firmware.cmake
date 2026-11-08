@@ -80,7 +80,49 @@ function(pbl_link_native)
   add_custom_target(pbl_firmware ALL DEPENDS ${artifacts})
 endfunction()
 
+# ESP-IDF host: no executable here. Everything the firmware is made of goes
+# into one archive, libpebbleos.a, which the ESP-IDF application in
+# soc/posix/espidf/app links together with its own main and driver bottoms.
+function(pbl_link_espidf)
+  get_property(object_libs GLOBAL PROPERTY PBL_OBJECT_LIBS)
+  get_property(static_libs GLOBAL PROPERTY PBL_STATIC_LIBS)
+
+  add_library(pebbleos_fw STATIC ${PBL_RESOURCE_SOURCES} ${PBL_FIRMWARE_SOURCES})
+  set_target_properties(pebbleos_fw PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+  add_dependencies(pebbleos_fw pbl_generated_headers)
+  target_link_libraries(pebbleos_fw PRIVATE pbl_interface)
+  foreach(lib ${object_libs})
+    target_sources(pebbleos_fw PRIVATE $<TARGET_OBJECTS:${lib}>)
+  endforeach()
+
+  # Merge the static libraries in with an ar MRI script.
+  set(mri "CREATE ${PROJECT_BINARY_DIR}/libpebbleos.a\nADDLIB $<TARGET_FILE:pebbleos_fw>\n")
+  foreach(lib ${static_libs})
+    string(APPEND mri "ADDLIB $<TARGET_FILE:${lib}>\n")
+  endforeach()
+  string(APPEND mri "SAVE\nEND\n")
+  file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/libpebbleos.mri CONTENT "${mri}")
+
+  add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/libpebbleos.a
+    COMMAND ${CMAKE_COMMAND} -E rm -f ${PROJECT_BINARY_DIR}/libpebbleos.a
+    COMMAND ${CMAKE_AR} -M < ${PROJECT_BINARY_DIR}/libpebbleos.mri
+    DEPENDS pebbleos_fw ${static_libs} ${PROJECT_BINARY_DIR}/libpebbleos.mri
+    COMMENT "Merging the firmware into libpebbleos.a"
+  )
+
+  set(artifacts ${PROJECT_BINARY_DIR}/libpebbleos.a)
+  if(PBL_PBPACK)
+    list(APPEND artifacts ${PBL_PBPACK})
+  endif()
+  add_custom_target(pbl_firmware ALL DEPENDS ${artifacts})
+endfunction()
+
 function(pbl_link_firmware)
+  if(CONFIG_POSIX_ESPIDF)
+    pbl_link_espidf()
+    return()
+  endif()
   if(NOT PBL_LINKER_SCRIPT)
     pbl_link_native()
     return()

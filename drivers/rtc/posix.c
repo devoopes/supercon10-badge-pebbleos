@@ -34,6 +34,16 @@ static int prv_get_time(const struct pbl_rtc *rtc, time_t *t) {
 static int prv_set_time(const struct pbl_rtc *rtc, time_t t) {
   struct timeval now;
 
+#ifdef CONFIG_POSIX_ESPIDF
+  // On ESP-IDF the host clock runs in the chip's RTC domain and survives
+  // resets, as a watch's RTC does, so set it rather than an offset that a
+  // reset would lose.
+  now = (struct timeval){.tv_sec = t};
+  if (settimeofday(&now, nullptr) == 0) {
+    s_offset_s = 0;
+    return 0;
+  }
+#endif
   gettimeofday(&now, nullptr);
   s_offset_s = (int64_t)t - now.tv_sec;
 

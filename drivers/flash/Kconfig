@@ -40,9 +40,15 @@ config FLASH_QEMU
 
 config FLASH_POSIX
     bool "POSIX External Flash"
-    default y if SOC_POSIX
+    default y if SOC_POSIX && !POSIX_ESPIDF
     help
       External flash backed by a file on the host.
+
+config FLASH_ESPIDF
+    bool "ESP-IDF partition as external flash"
+    default y if POSIX_ESPIDF
+    help
+      External flash backed by a partition of the ESP32's own flash.
 
 config FLASH_SHELL
     bool "Shell commands"

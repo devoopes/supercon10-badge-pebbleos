@@ -1,0 +1,59 @@
+/* SPDX-FileCopyrightText: 2026 Core Devices LLC */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#pragma once
+
+#include <pbl/util/units.h>
+
+// The Billboard badge: the single-slot layout's partitions, shrunk into the
+// "pebble" partition of the ESP32-S3's 8 MiB flash (see
+// soc/posix/espidf/app/partitions.csv). Offsets are from the start of that
+// partition. The firmware itself is the ESP-IDF application and lives in
+// its own partition, so the firmware partitions here are placeholders.
+
+#define PART_SAFE_FIRMWARE_OFFSET 0x0000000
+#define PART_SAFE_FIRMWARE_SIZE   PBL_KIB(4)
+#define PART_SAFE_FIRMWARE        PBL_FLASH_PARTITION(PART_SAFE_FIRMWARE)
+
+#define PART_MFG_INFO_OFFSET 0x0001000
+#define PART_MFG_INFO_SIZE   PBL_KIB(4)
+#define PART_MFG_INFO        PBL_FLASH_PARTITION(PART_MFG_INFO)
+
+#define PART_FIRMWARE_SLOT_1_OFFSET 0x0002000
+#define PART_FIRMWARE_SLOT_1_SIZE   PBL_KIB(4)
+#define PART_FIRMWARE_SLOT_1        PBL_FLASH_PARTITION(PART_FIRMWARE_SLOT_1)
+
+#define PART_SYSTEM_RESOURCES_BANK_0_OFFSET 0x0010000
+#define PART_SYSTEM_RESOURCES_BANK_0_SIZE   PBL_MIB(1)
+#define PART_SYSTEM_RESOURCES_BANK_0        PBL_FLASH_PARTITION(PART_SYSTEM_RESOURCES_BANK_0)
+
+#define PART_SYSTEM_RESOURCES_BANK_1_OFFSET 0x0110000
+#define PART_SYSTEM_RESOURCES_BANK_1_SIZE   PBL_MIB(1)
+#define PART_SYSTEM_RESOURCES_BANK_1        PBL_FLASH_PARTITION(PART_SYSTEM_RESOURCES_BANK_1)
+
+#define PART_FILESYSTEM_OFFSET 0x0210000
+#define PART_FILESYSTEM_SIZE   PBL_KIB(2560)
+#define PART_FILESYSTEM        PBL_FLASH_PARTITION(PART_FILESYSTEM)
+
+#define PART_DEBUG_DB_OFFSET 0x0490000
+#define PART_DEBUG_DB_SIZE   PBL_KIB(128)
+#define PART_DEBUG_DB        PBL_FLASH_PARTITION(PART_DEBUG_DB)
+
+#define PART_MFG_RESULTS_OFFSET 0x04b0000
+#define PART_MFG_RESULTS_SIZE   PBL_KIB(4)
+#define PART_MFG_RESULTS        PBL_FLASH_PARTITION(PART_MFG_RESULTS)
+
+#define PART_MFG_BATTERY_STATE_OFFSET 0x04b1000
+#define PART_MFG_BATTERY_STATE_SIZE   PBL_KIB(4)
+#define PART_MFG_BATTERY_STATE        PBL_FLASH_PARTITION(PART_MFG_BATTERY_STATE)
+
+#define PART_SHARED_PRF_STORAGE_OFFSET 0x04b2000
+#define PART_SHARED_PRF_STORAGE_SIZE   PBL_KIB(4)
+#define PART_SHARED_PRF_STORAGE        PBL_FLASH_PARTITION(PART_SHARED_PRF_STORAGE)
+
+#define PART_TZINFO_OFFSET 0x04b3000
+#define PART_TZINFO_SIZE   PBL_KIB(4)
+#define PART_TZINFO        PBL_FLASH_PARTITION(PART_TZINFO)
+
+// Size of the "pebble" partition; everything above must fit below it.
+#define PART_BILLBOARD_TOTAL_SIZE 0x04e0000

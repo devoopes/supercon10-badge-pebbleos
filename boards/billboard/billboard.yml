@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Core Devices LLC
+# SPDX-License-Identifier: Apache-2.0
+#
+# Hackaday Supercon 2026 Billboard badge: ESP32-S3, 9.7" e-paper. Built as a
+# library for the ESP-IDF application in soc/posix/espidf/app, which flashes it.
+
+runners: []

@@ -14,4 +14,6 @@
 #include "partitions_dual_slot.h"
 #elifdef CONFIG_BOARD_PARTITIONS_SINGLE_SLOT
 #include "partitions_single_slot.h"
+#elifdef CONFIG_BOARD_PARTITIONS_BILLBOARD
+#include "partitions_billboard.h"
 #endif

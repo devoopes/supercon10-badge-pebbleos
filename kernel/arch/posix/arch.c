@@ -15,6 +15,12 @@
 #undef free
 #undef calloc
 #include <stdlib.h>
+#ifdef CONFIG_POSIX_ESPIDF
+// newlib's <stdlib.h> came in earlier, declaring the renamed heap functions
+// only, and its include guard keeps it from declaring these again.
+void *calloc(size_t nmemb, size_t size);
+void free(void *ptr);
+#endif
 
 // One pthread per kernel thread; the one holding posix_cpu is the one the
 // kernel considers running. Switches hand posix_cpu over explicitly, so the
@@ -92,7 +98,8 @@ void posix_run(struct pbl_thread *t) {
   pt->run = true;
   if (!pt->created) {
     pt->created = true;
-    pthread_create(&pt->tid, nullptr, prv_thread_main, pt);
+    // A thread that never starts would leave the CPU to nobody.
+    PBL_ASSERTN(pthread_create(&pt->tid, nullptr, prv_thread_main, pt) == 0);
   } else {
     pthread_cond_signal(&pt->wake);
   }

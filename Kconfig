@@ -151,6 +151,12 @@ config BOARD_PARTITIONS_SINGLE_SLOT
     help
       The board uses the flash partitions of include/pbl/board/partitions_single_slot.h.
 
+config BOARD_PARTITIONS_BILLBOARD
+    bool
+    help
+      The board uses the flash partitions of include/pbl/board/partitions_billboard.h:
+      the single-slot partitions, shrunk to fit an 8 MiB ESP32 flash.
+
 # Source the active board's Kconfig and its per-board defaults; kconfig.py
 # exports $(BOARD) and $(BOARD_REVISION) from the --board argument.
 rsource "boards/$(BOARD)/Kconfig"

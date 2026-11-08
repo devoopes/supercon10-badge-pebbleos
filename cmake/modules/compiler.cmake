@@ -18,6 +18,13 @@ add_compile_options(-Werror)
 if(CONFIG_ARCH_POSIX)
   # Host clang does not know some of the GCC-only flags shared with ARM.
   add_compile_options(-Wno-unknown-warning-option)
+  if(CONFIG_POSIX_ESPIDF)
+    # Xtensa GCC has no AddressSanitizer, and so ignores no_sanitize_address.
+    add_compile_options(-Wno-attributes)
+    # ESP-IDF's linker script defines _heap_start and _heap_end for its own
+    # heap, and its definitions win: the kernel heap's bounds get other names.
+    add_compile_definitions(_heap_start=pbl_kernel_heap_start _heap_end=pbl_kernel_heap_end)
+  endif()
   # Enums as small as the ARM EABI makes them, for the same struct layouts.
   set(pbl_arch_flags
     -fno-common

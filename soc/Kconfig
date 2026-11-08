@@ -64,6 +64,16 @@ config POSIX_EMSCRIPTEN
       with Emscripten. Kernel threads are fibers on the browser's single
       thread, and the browser's event loop drives the host side.
 
+config POSIX_ESPIDF
+    bool "ESP-IDF"
+    depends on SOC_POSIX
+    help
+      The host is ESP-IDF on an Espressif chip. Its FreeRTOS pthreads and
+      newlib stand in for the host's, so the posix kernel backend runs
+      unchanged. The firmware is built as a static library, which an
+      ESP-IDF application (soc/posix/espidf/app) links, providing the
+      bottom halves of the drivers in place of the SDL and terminal ones.
+
 config SDL
     bool
     depends on SOC_POSIX

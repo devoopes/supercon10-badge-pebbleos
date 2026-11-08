@@ -1,0 +1,60 @@
+# Where the firmware library goes in ESP-IDF's memory map.
+#
+# - Its zeroed data, over 700 KiB of heaps and app RAM, in PSRAM.
+# - Its registries (PBL_UNSORTED_SECTION in pbl/kernel/section.h) in flash,
+#   kept, each between _<name>_start and _<name>_end. A native build leaves
+#   them to the linker, which names the bounds __start_<name> and
+#   __stop_<name>; main/CMakeLists.txt defines those as aliases. Keep the list
+#   in step with `objdump -h libpebbleos.a`.
+
+[sections:pbl_devices]
+entries:
+    pbl_devices
+
+[sections:pbl_input_cb]
+entries:
+    pbl_input_cb
+
+[sections:pbl_log_be]
+entries:
+    pbl_log_be
+
+[sections:pbl_shroot]
+entries:
+    pbl_shroot
+
+[sections:pbl_shset]
+entries:
+    pbl_shset
+
+[sections:pbl_shsub]
+entries:
+    pbl_shsub
+
+[sections:pbl_sys_off]
+entries:
+    pbl_sys_off
+
+[scheme:pebbleos]
+entries:
+    bss -> extern_ram
+    common -> extern_ram
+    pbl_devices -> flash_rodata
+    pbl_input_cb -> flash_rodata
+    pbl_log_be -> flash_rodata
+    pbl_shroot -> flash_rodata
+    pbl_shset -> flash_rodata
+    pbl_shsub -> flash_rodata
+    pbl_sys_off -> flash_rodata
+
+[mapping:pebbleos]
+archive: libpebbleos.a
+entries:
+    * (pebbleos);
+        pbl_devices -> flash_rodata KEEP() SURROUND(pbl_devices),
+        pbl_input_cb -> flash_rodata KEEP() SURROUND(pbl_input_cb),
+        pbl_log_be -> flash_rodata KEEP() SURROUND(pbl_log_be),
+        pbl_shroot -> flash_rodata KEEP() SURROUND(pbl_shroot),
+        pbl_shset -> flash_rodata KEEP() SURROUND(pbl_shset),
+        pbl_shsub -> flash_rodata KEEP() SURROUND(pbl_shsub),
+        pbl_sys_off -> flash_rodata KEEP() SURROUND(pbl_sys_off)
