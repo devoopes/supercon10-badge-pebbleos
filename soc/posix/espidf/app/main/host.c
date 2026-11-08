@@ -8,6 +8,7 @@
 
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "esp_attr.h"
@@ -74,6 +75,13 @@ uint64_t posix_host_monotonic_us(void) {
 
 const char *posix_host_exe_dir(void) {
   return "/";
+}
+
+// Samsa's .pbw bottom (subsys/samsa/samsa_pbw_bottom.c on other hosts):
+// a badge has no command line to install apps from, so the firmware only
+// ever gets them from the phone, and never has a host buffer to give back.
+void samsa_pbw_release(void *pbw) {
+  free(pbw);
 }
 
 // Odds and ends of POSIX that newlib on ESP-IDF lacks.

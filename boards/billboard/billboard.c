@@ -4,8 +4,9 @@
 // Hackaday Supercon 2026 Billboard badge, as a Flint. The firmware halves of
 // the native drivers, with ESP-IDF bottoms (soc/posix/espidf/app): the console
 // is the ESP32-S3's USB serial port, the display is the 9.7" e-paper panel,
-// the buttons are the badge's four, and the flash is a partition of the
-// chip's. The rest is simulated as on native_flint.
+// the buttons are the badge's four, the flash is a partition of the chip's,
+// and Bluetooth is the chip's BLE controller. The rest is simulated as on
+// native_flint.
 
 #include <pbl/board.h>
 #include <pbl/drivers/ambient/posix.h>
@@ -25,6 +26,10 @@ const struct pbl_uart *const CONSOLE_UART = &s_dbg_uart.uart;
 // The phone link of the emulator; not connected yet.
 PBL_UART_POSIX_DEFINE(s_qemu_uart, "qemu", PBL_UART_POSIX_QEMU, 115200);
 const struct pbl_uart *const QEMU_UART = &s_qemu_uart.uart;
+
+// The ESP32-S3's BLE controller.
+PBL_UART_POSIX_DEFINE(s_bt_hci_uart, "bt_hci", PBL_UART_POSIX_BT_HCI, 115200);
+const struct pbl_uart *const BT_HCI_UART = &s_bt_hci_uart.uart;
 
 PBL_DISPLAY_SDL_DEFINE(s_display, "display", CONFIG_DISPLAY_SDL_WIDTH, CONFIG_DISPLAY_SDL_HEIGHT,
                        PBL_DISPLAY_FORMAT_MONO, .round_mask = nullptr);

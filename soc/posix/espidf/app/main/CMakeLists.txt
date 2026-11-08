@@ -11,6 +11,7 @@ idf_component_register(
     display_bottom.c
     input_bottom.c
     epd.c
+    bt_bottom.c
   INCLUDE_DIRS "."
   PRIV_INCLUDE_DIRS
     ${pbl_base}/soc/posix/include
@@ -18,16 +19,18 @@ idf_component_register(
     ${pbl_base}/drivers/input/sdl
     ${pbl_base}/drivers/uart/posix
   PRIV_REQUIRES esp_driver_gpio esp_driver_spi esp_driver_usb_serial_jtag esp_partition esp_psram
-                esp_timer pthread
+                esp_timer pthread bt nvs_flash
   LDFRAGMENTS pebbleos.lf
   # The firmware calls the bottoms, and comes later on the link line.
   WHOLE_ARCHIVE
 )
 
 # Every object, for the constructors and the sections nothing refers to by
-# name; --gc-sections then drops what is unused.
-# One argument, so that CMake cannot merge its flags with ESP-IDF's own.
-target_link_libraries(${COMPONENT_LIB} INTERFACE
+# name; --gc-sections then drops what is unused. One argument, so that CMake
+# cannot merge its flags with ESP-IDF's own; and a link option, which comes
+# before the libraries, so that what the firmware brings (mbedTLS) is defined
+# before ESP-IDF's libraries would pull their own copies in.
+target_link_options(${COMPONENT_LIB} INTERFACE
   "-Wl,--whole-archive,${PBL_BUILD_DIR}/libpebbleos.a,--no-whole-archive")
 # Also as a library ESP-IDF knows, so that pebbleos.lf applies to it; by
 # then everything in it is linked, and this adds nothing more.

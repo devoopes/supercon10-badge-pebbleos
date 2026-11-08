@@ -1,9 +1,9 @@
 /* SPDX-FileCopyrightText: 2026 Core Devices LLC */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-// The UART bottoms: the console is the ESP32-S3's USB serial port. The other
-// channels (the emulator's phone link, Bluetooth HCI) are not connected yet,
-// so what is written to them is dropped.
+// The UART bottoms: the console is the ESP32-S3's USB serial port, and
+// Bluetooth HCI goes to the chip's BLE controller (bt_bottom.c). The
+// emulator's phone link is not connected, so what is written to it is dropped.
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -13,6 +13,8 @@
 #include "freertos/task.h"
 
 #include <uart_posix_bottom.h>
+
+#include "bt_bottom.h"
 
 static bool s_console_started;
 
@@ -47,6 +49,10 @@ void uart_posix_bottom_start(enum uart_posix_channel channel) {
 }
 
 void uart_posix_bottom_write(enum uart_posix_channel channel, uint8_t c) {
+  if (channel == UART_POSIX_BT_HCI) {
+    bt_bottom_write(c);
+    return;
+  }
   if (channel != UART_POSIX_CONSOLE || !s_console_started) {
     return;
   }

@@ -37,10 +37,13 @@ CONFIG_LOG_HASHED=n
 CONFIG_ACCEL=y
 CONFIG_ACCEL_POSIX=y
 
-CONFIG_SAMSA=n
-
 # Silent, as on native_flint: the reminders app needs the voice window.
 CONFIG_MIC=y
 
 CONFIG_SERVICE_ACCEL_MANAGER_DEFAULT_SENSITIVITY=85
 CONFIG_BT_VENDOR_NAME="Billboard"
+
+# The ESP32-S3's own BLE controller, reached over ESP-IDF's VHCI as an H4
+# "UART" (soc/posix/espidf/app/main/bt_bottom.c), with its factory address.
+CONFIG_BT_HCI_UART=y
+CONFIG_BT_ID_ADDR_CONTROLLER=y

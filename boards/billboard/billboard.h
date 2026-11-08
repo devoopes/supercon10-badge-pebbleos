@@ -4,3 +4,4 @@
 #pragma once
 
 extern const struct pbl_uart *const QEMU_UART;
+extern const struct pbl_uart *const BT_HCI_UART;
