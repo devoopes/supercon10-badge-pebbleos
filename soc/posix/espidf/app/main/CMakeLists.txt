@@ -25,6 +25,27 @@ idf_component_register(
   WHOLE_ARCHIVE
 )
 
+# The panel's waveform comes from the badge firmware, a submodule; lut_b.h is
+# generated from it rather than kept here.
+set(badge_luts
+    ${pbl_base}/third_party/billboard_badge/2026-Billboard_Badge/firmware/badge/data/rendered_luts.py)
+if(NOT EXISTS ${badge_luts})
+  message(FATAL_ERROR "${badge_luts} is missing: git submodule update --init "
+                      "third_party/billboard_badge/2026-Billboard_Badge")
+endif()
+idf_build_get_property(python PYTHON)
+set(lut_dir ${CMAKE_CURRENT_BINARY_DIR}/generated)
+add_custom_command(
+  OUTPUT ${lut_dir}/lut_b.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${lut_dir}
+  COMMAND ${python} ${CMAKE_CURRENT_LIST_DIR}/gen_lut.py ${badge_luts} ${lut_dir}/lut_b.h
+  DEPENDS ${CMAKE_CURRENT_LIST_DIR}/gen_lut.py ${badge_luts}
+  VERBATIM
+)
+add_custom_target(billboard_lut DEPENDS ${lut_dir}/lut_b.h)
+add_dependencies(${COMPONENT_LIB} billboard_lut)
+target_include_directories(${COMPONENT_LIB} PRIVATE ${lut_dir})
+
 # Every object, for the constructors and the sections nothing refers to by
 # name; --gc-sections then drops what is unused. One argument, so that CMake
 # cannot merge its flags with ESP-IDF's own; and a link option, which comes
